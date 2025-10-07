@@ -1,9 +1,9 @@
+// src/routes/authRoutes.js
 const express = require("express");
 const router = express.Router();
-const { register, login } = require("../controllers/authController");
+const { registerUser, loginUser } = require("../controllers/authController");
 
-// In production, you might disable open registration
-router.post("/register", register);
-router.post("/login", login);
+router.post("/register", registerUser);
+router.post("/login", loginUser);
 
 module.exports = router;

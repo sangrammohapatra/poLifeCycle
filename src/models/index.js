@@ -1,5 +1,5 @@
 const sequelize = require("../config/db");
-const User = require("./user");
+const User = require("./User");
 const PurchaseOrder = require("./purchaseOrder");
 const PoHistory = require("./poHistory");
 

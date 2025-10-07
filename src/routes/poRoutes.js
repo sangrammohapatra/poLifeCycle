@@ -1,19 +1,32 @@
+// src/routes/poRoutes.js
 const express = require("express");
 const router = express.Router();
-const auth = require("../middleware/auth");
-const { permit } = require("../middleware/roles");
-const poCtrl = require("../controllers/poController");
+const {
+  createPO,
+  submitPO,
+  approvePO,
+  rejectPO,
+  getPOs,
+  getPOHistory,
+} = require("../controllers/poController");
+const protect = require("../middleware/authMiddleware");
+const authorizeRoles = require("../middleware/roleMiddleware");
 
-router.use(auth); // all PO routes require auth
-
-router.post("/", permit("creator", "admin"), poCtrl.createPO);
-router.put("/:id", permit("creator", "admin"), poCtrl.updatePO);
-router.post("/:id/submit", permit("creator", "admin"), poCtrl.submitPO);
-router.post("/:id/approve", permit("approver", "admin"), poCtrl.approvePO);
-router.post("/:id/reject", permit("approver", "admin"), poCtrl.rejectPO);
-router.post("/:id/comment", poCtrl.addComment);
-
-router.get("/", poCtrl.listPOs);
-router.get("/:id", poCtrl.getPoDetails);
+router.get("/", protect, getPOs);
+router.get("/:id/history", protect, getPOHistory);
+router.post("/", protect, authorizeRoles("creator"), createPO);
+router.put("/:id/submit", protect, authorizeRoles("creator"), submitPO);
+router.put(
+  "/:id/approve",
+  protect,
+  authorizeRoles("approver", "admin"),
+  approvePO
+);
+router.put(
+  "/:id/reject",
+  protect,
+  authorizeRoles("approver", "admin"),
+  rejectPO
+);
 
 module.exports = router;
