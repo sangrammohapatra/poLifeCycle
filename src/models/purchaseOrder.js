@@ -1,37 +1,33 @@
-const { DataTypes } = require("sequelize");
+// src/models/purchaseOrder.js
+const mongoose = require("mongoose");
 
-module.exports = (sequelize) => {
-  const PurchaseOrder = sequelize.define(
-    "PurchaseOrder",
-    {
-      id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
-      },
-      poNumber: { type: DataTypes.STRING, allowNull: false, unique: true },
-      status: {
-        type: DataTypes.ENUM("DRAFT", "SUBMITTED", "APPROVED", "REJECTED"),
-        allowNull: false,
-        defaultValue: "DRAFT",
-      },
-      items: { type: DataTypes.JSONB, allowNull: false, defaultValue: [] },
-      totalAmount: {
-        type: DataTypes.DECIMAL(12, 2),
-        allowNull: false,
-        defaultValue: 0,
-      },
-      submittedById: { type: DataTypes.UUID, allowNull: true },
-      submittedAt: { type: DataTypes.DATE, allowNull: true },
-      approvedById: { type: DataTypes.UUID, allowNull: true },
-      approvedAt: { type: DataTypes.DATE, allowNull: true },
-      rejectionReason: { type: DataTypes.TEXT, allowNull: true },
+const itemSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  quantity: { type: Number, required: true },
+  unitPrice: { type: Number, required: true },
+  total: { type: Number, required: true },
+});
+
+const purchaseOrderSchema = new mongoose.Schema(
+  {
+    poNumber: { type: String, unique: true, required: true },
+    vendor: { type: String, required: true },
+    description: { type: String },
+    amount: { type: Number, required: true },
+    items: [itemSchema],
+    status: {
+      type: String,
+      enum: ["Draft", "Submitted", "Approved", "Rejected"],
+      default: "Draft",
     },
-    {
-      tableName: "purchase_orders",
-      timestamps: true,
-    }
-  );
+    creator: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
 
-  return PurchaseOrder;
-};
+const PurchaseOrder = mongoose.model("PurchaseOrder", purchaseOrderSchema);
+module.exports = PurchaseOrder;

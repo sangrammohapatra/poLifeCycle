@@ -1,13 +1,10 @@
-const { v4: uuidv4 } = require("uuid");
+// src/utils/poNumber.js
+const PurchaseOrder = require("../models/purchaseOrder");
 
-/**
- * Simple PO number generator: PO-<timestamp>-<shortuuid>
- * You can replace with a DB-sequence for production.
- */
-function generatePoNumber() {
-  const short = uuidv4().split("-")[0].toUpperCase();
-  const ts = Date.now().toString().slice(-6);
-  return `PO-${ts}-${short}`;
-}
+const generatePoNumber = async () => {
+  const count = await PurchaseOrder.countDocuments({});
+  const poNumber = `PO-${(count + 1).toString().padStart(5, "0")}`;
+  return poNumber;
+};
 
-module.exports = generatePoNumber;
+module.exports = { generatePoNumber };
